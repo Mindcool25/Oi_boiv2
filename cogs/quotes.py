@@ -57,7 +57,7 @@ class Quotes(commands.Cog):
                 col += i.content + "\n"
         # AHHH scary regex
         # original: (((("|“|”)((.|\n)*?)("|“|”)|\(((.|\n)*?)\)|\*((.|\n)*?)\*)\s*)+-[^-](.*?))+$
-        regex = "(((\\*.*\\*)+|(\\(.*\\))+)*[^\\S\\r\\n]*((\"|“|”)(.)*?(\"|“|”)\\s*)\\n-(.)*)"
+        regex = "(((\\*.*\\*)+|(\\(.*\\))+)*[^\\S\\r\\n]*((\"|“|”)(.)*?(\"|“|”)\\s*)+\\n-((.)*))"
         found = re.findall(regex, col)
         # Parsing result from regex
         parsed = {}
@@ -65,16 +65,14 @@ class Quotes(commands.Cog):
             print("Quote:", quote)
             out = ""
             # I'm sorry for the magic numbers here, but it is needed.
-            out = f"{quote[0]}"
-            author = quote[1]
+            out = f"{quote[4]}"
+            author = quote[8].strip(' ')
             parsed[out] = author
         print("Parsed quotes:", parsed)
 
         # Add to json file after looking for duplicates
         await msg.edit_original_response(content=f"Found and parsed {len(parsed)} quotes.")
-
         add_to_database(parsed)
-        
 
 
 # Adds cog to bot when called
@@ -95,7 +93,6 @@ def add_to_database(parsed_quotes):
             print(f"Adding '{key}' to quotes")
             quotes[key] = parsed_quotes[key]
     json_obj = json.dumps(quotes, indent=2)
-    
-    with open("cogs/out.json", "w") as outfile:
+    with open("cogs/quotes.json", "w") as outfile:
         outfile.write(json_obj)
 
