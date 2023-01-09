@@ -25,7 +25,7 @@ class Quotes(commands.Cog):
 
         # Getting a random quote, either from search or from everything
         if word == "":
-            # Grabbing a random quote
+            # Grabbing a random quote, author = choice(list(quotes.items()))
             quote, author = choice(list(quotes.items()))
             # Formatting quote
             send = f"{quote}\n- {author}"
@@ -37,7 +37,6 @@ class Quotes(commands.Cog):
                     found_quotes.append([i, quotes[i]])
                 elif word in quotes[i]:
                     found_quotes.append([i, quotes[i]])
-            print(found_quotes)
             quote, author = choice(found_quotes)
 
             send = f"{quote}\n- {author}"
@@ -50,27 +49,29 @@ class Quotes(commands.Cog):
     # Collecting quotes from channel command was executed in
     @discord.slash_command()
     async def collect(self, ctx):
+        msg = await ctx.respond("Searching...")
         channel = ctx.channel
         col = ""
         async for i in channel.history():
-            if i.content != "":
-                print(i.content)
+            if i.content != "" and '\"' in i.content:
                 col += i.content + "\n"
         # AHHH scary regex
-        found = re.findall("(\(.*\))*(\*.*\*)*.*(.*(\"|“|”).*(\"|“|”).*(\(.*\))*(\*.*\*)*( )*\n*)+(-.*)+", col)
-
+        # original: (((("|“|”)((.|\n)*?)("|“|”)|\(((.|\n)*?)\)|\*((.|\n)*?)\*)\s*)+-[^-](.*?))+$
+        regex = "(((\\*.*\\*)+|(\\(.*\\))+)*[^\\S\\r\\n]*((\"|“|”)(.)*?(\"|“|”)\\s*)\\n-(.)*)"
+        found = re.findall(regex, col)
         # Parsing result from regex
         parsed = {}
         for quote in found:
+            print("Quote:", quote)
             out = ""
             # I'm sorry for the magic numbers here, but it is needed.
-            out = f"{quote[0]}{quote[1]}{quote[2]}{quote[5]}{quote[6]}{quote[7]}".strip("\n")
-            author = quote[8]
+            out = f"{quote[0]}"
+            author = quote[1]
             parsed[out] = author
         print("Parsed quotes:", parsed)
 
         # Add to json file after looking for duplicates
-        await ctx.respond(f"Found and parsed {len(found)} quotes. Adding to database.")
+        await msg.edit_original_response(content=f"Found and parsed {len(parsed)} quotes.")
 
         add_to_database(parsed)
         

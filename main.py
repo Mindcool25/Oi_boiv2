@@ -7,7 +7,9 @@ dotenv.load_dotenv()
 token = str(os.getenv("TOKEN"))
 
 # Setting up the bot object
-bot = discord.Bot()
+intents = discord.Intents.default()
+intents.message_content = True
+bot = discord.Bot(intents=intents)
 
 # Onready function
 @bot.event
