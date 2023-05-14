@@ -30,8 +30,7 @@ class Quotes(commands.Cog):
             # Formatting quote
             send = f"{quote}\n- {author}"
         else:
-            # Get all quotes with specified word
-            found_quotes = []
+            # Get all quotes with specified word found_quotes = []
             for i in quotes:
                 if word in i:
                     found_quotes.append([i, quotes[i]])
@@ -73,6 +72,36 @@ class Quotes(commands.Cog):
         # Add to json file after looking for duplicates
         await msg.edit_original_response(content=f"Found and parsed {len(parsed)} quotes.")
         add_to_database(parsed)
+
+    # TODO rewrite this to acutally be ok code
+    @discord.slash_command()
+    async def stats(self, ctx, person = ""):
+        msg = await ctx.respond("Calcuating...")
+
+        f = open("cogs/quotes.json")
+        quotes = json.load(f)
+        f.close()
+
+        print("Stats for everyone")
+        authors = []
+        for i in quotes:
+            authors.append(quotes[i].split("/")[0].strip())
+
+        found = []
+        counted = []
+        for author in authors:
+            if author not in found:
+                found.append(author)
+                counted.append(f"{author} - {authors.count(author)}")
+        out = ""
+        for i in counted:
+            if person != "":
+                if person in i:
+                    out += f"{i}\n"
+            else:
+                out += f"{i}\n"
+
+        await msg.edit_original_response(content=f"{out}")
 
 
 # Adds cog to bot when called
