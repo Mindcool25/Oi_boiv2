@@ -30,15 +30,19 @@ class Quotes(commands.Cog):
             # Formatting quote
             send = f"{quote}\n- {author}"
         else:
-            # Get all quotes with specified word found_quotes = []
+            # Get all quotes with specified word
+            found_quotes = []
             for i in quotes:
-                if word in i:
+                if word.lower() in i.lower():
                     found_quotes.append([i, quotes[i]])
-                elif word in quotes[i]:
+                elif word.lower() in quotes[i].lower():
                     found_quotes.append([i, quotes[i]])
-            quote, author = choice(found_quotes)
 
-            send = f"{quote}\n- {author}"
+            if found_quotes:
+                quote, author = choice(found_quotes)
+                send = f"{quote}\n- {author}"
+            else:
+                send = f"No quotes found with {word}"
 
         # Sending chosen quote
         print(f"Sending quote:\n{send}")
