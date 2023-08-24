@@ -4,7 +4,7 @@ import os
 
 # Setting up env variables (Hey look, actually protecting my token)
 dotenv.load_dotenv()
-token = str(os.getenv("TOKEN"))
+TOKEN = str(os.getenv("TOKEN"))
 
 # Setting up the bot object
 intents = discord.Intents.default()
@@ -22,11 +22,11 @@ async def ping(ctx):
     await ctx.respond("Pong!")
 
 # Loading cogs
-extensions = ["cogs.quotes"]
+extensions = ["cogs.quotes", "cogs.oi"]
 
 for cog in extensions:
     bot.load_extension(cog)
     print(f"Loaded cog: {cog}")
 
 
-bot.run(token)
+bot.run(TOKEN)
